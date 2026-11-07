@@ -1,238 +1,594 @@
 
 import { createMap } from "./charts/map.js";
+import { createLineChart } from "./charts/line.js";
 
 async function main() {
-  if (typeof d3 === "undefined" || typeof topojson === "undefined") {
-    throw new Error("D3 or TopoJSON failed to load. Check your internet connection and script URLs.");
+  if (
+    typeof d3 === "undefined" ||
+    typeof topojson === "undefined"
+  ) {
+    throw new Error("D3 or TopoJSON failed to load.");
   }
 
-  // Match the file path in your project. Keep this path when replacing the CSV.
+  // -----------------------------------
+  // Load data
+  // -----------------------------------
+
   const csvPath = "./data/world_happiness.csv";
-  const response = await fetch(csvPath);
-  if (!response.ok) {
-    throw new Error(`Could not load ${csvPath} (HTTP ${response.status}). Check that Live Server is serving the project root.`);
-  }
-  const allData = d3.csvParse(await response.text(), d3.autoType);
-  if (!allData.length) throw new Error("The happiness CSV has no rows.");
 
-  // Single source of truth for linked charts later.
+  const response = await fetch(csvPath);
+
+  if (!response.ok) {
+    throw new Error(
+      `Could not load ${csvPath} (HTTP ${response.status}).`
+    );
+  }
+
+  const allRows = d3.csvParse(
+    await response.text(),
+    d3.autoType
+  ).filter(d =>
+    Number.isFinite(d.Year) &&
+    Number.isFinite(d["Happiness Score"])
+  );
+
+  if (!allRows.length) {
+    throw new Error(
+      "No usable happiness scores found."
+    );
+  }
+
+  // Fixed rank scale across the entire dataset.
+  const ranks = allRows
+    .map(d => Number(d["Happiness Rank"]))
+    .filter(n =>
+      Number.isFinite(n) && n > 0
+    );
+
+  if (!ranks.length) {
+    throw new Error(
+      "No Happiness Rank column found in the CSV."
+    );
+  }
+
+  const rankDomain = d3.extent(ranks);
+
+  const years = [
+    ...new Set(allRows.map(d => d.Year))
+  ].sort((a, b) => a - b);
+
+  const firstYear = years[0];
+  const lastYear = years.at(-1);
+
+  const rowsByYear = d3.group(
+    allRows,
+    d => d.Year
+  );
+
   const selectedCountries = new Set();
 
-  const yearSlider = d3.select("#year-slider");
-  const yearLabel = d3.select("#year-label");
-
-  const availableYears = [...new Set(allData.map(row => row.Year))].sort((a, b) => a - b);
-  const firstYear = availableYears[0];
-  const lastYear = availableYears.at(-1);
-
-  let selectedYear = lastYear;
-
-  yearSlider
-    .attr("min", firstYear)
-    .attr("max", lastYear)
-    .property("value", selectedYear);
-
-  function getYearData() {
-    return allData.filter(row => row.Year === selectedYear);
-  }
-
-  function getFilteredData() {
-    const data = getYearData();
-
-    return selectedCountries.size === 0
-      ? data
-      : data.filter(row => selectedCountries.has(row.Country));
-  }
-
-  const map = await createMap(getYearData(), onCountryClick);
-
-  function updateVisualizations() {
-    const data = getFilteredData();
-    const average = d3.mean(data, row => row["Happiness Score"]);
-
-    const nameText = selectedCountries.size === 0
-      ? "All countries"
-      : `Selected: ${[...selectedCountries].sort().join(", ")}`;
-
-    const averageText = average == null
-      ? "N/A"
-      : average.toFixed(2);
-
-    yearLabel.text(selectedYear);
-
-    d3.select("#selection-info")
-      .text(`${nameText} | Average happiness (${selectedYear}): ${averageText}`);
-
-    map.updateSelection(selectedCountries);
-
-    // Future summary charts use data.
-    // Future comparison bar chart is hidden if selectedCountries.size === 0.
-  }
-
-  function onCountryClick(countryName) {
-    if (selectedCountries.has(countryName)) {
-      selectedCountries.delete(countryName);
-    } else {
-      selectedCountries.add(countryName);
-    }
-
-    updateVisualizations();
-  }
-
-  // ==============================
-  // Animation controls
-  // ==============================
-
-  const timeline = d3.select("#timeline");
-  const playbackButton = d3.select("#playback-button");
-  const playbackIcon = d3.select("#playback-icon");
-  const playbackMessage = d3.select("#playback-message");
-
-  // Possible states: idle, playing, paused, finished
+  let year = lastYear;
   let playbackState = "idle";
   let playbackTimer = null;
+
+  // -----------------------------------
+  // Initialize components
+  // -----------------------------------
+
+  const slider = d3.select("#year-slider")
+    .attr("min", firstYear)
+    .attr("max", lastYear)
+    .property("value", firstYear);
+
+  const sliderLabel = d3.select("#year-label");
+  const timeline = d3.select("#timeline");
+  const playButton = d3.select("#playback-button");
+  const playIcon = d3.select("#playback-icon");
+  const subtitle = d3.select("#chart-subtitle");
+
+  const lineChart = createLineChart(
+    allRows,
+    years
+  );
+
+  const map = await createMap(
+    rowsByYear.get(year) ?? [],
+    onCountryClick,
+    rankDomain
+  );
+
+  // -----------------------------------
+  // Country selection
+  // -----------------------------------
+
+  function selectionTitle() {
+    const names = [...selectedCountries].sort();
+
+    if (!names.length) {
+      return "All countries (average)";
+    }
+
+    if (names.length === 1) {
+      return `${names[0]} vs. global average`;
+    }
+
+    if (names.length === 2) {
+      return `${names[0]} and ${names[1]} vs. global average`;
+    }
+
+    return `${names.join(", ")} vs. global average`;
+  }
+
+  function updateSelectionLabels() {
+    const names = [...selectedCountries].sort();
+    const label = selectionTitle();
+
+    subtitle
+      .text(label)
+      .attr("title", label);
+
+    const length = label.length;
+
+    subtitle.style(
+      "font-size",
+      length > 125 ? "11px"
+        : length > 85 ? "12px"
+        : length > 55 ? "14px"
+        : null
+    );
+
+    subtitle.classed(
+      "many-countries",
+      names.length > 2
+    );
+  }
+
+  // -----------------------------------
+  // Refresh map and chart
+  // -----------------------------------
+
+  function refresh() {
+    const yearRows =
+      rowsByYear.get(year) ?? [];
+
+    const filtered = selectedCountries.size
+      ? yearRows.filter(d =>
+          selectedCountries.has(d.Country)
+        )
+      : yearRows;
+
+    const averageRank = d3.mean(
+      filtered,
+      d => {
+        const rank = Number(
+          d["Happiness Rank"]
+        );
+
+        return Number.isFinite(rank) && rank > 0
+          ? rank
+          : undefined;
+      }
+    );
+
+    const scope = selectedCountries.size
+      ? [...selectedCountries].sort().join(", ")
+      : "All countries";
+
+    d3.select("#map-year").text(year);
+
+    d3.select("#selection-info")
+      .text(
+        `${scope} | Average happiness rank (${year}): ${
+          averageRank === undefined
+            ? "N/A"
+            : averageRank.toFixed(1)
+        }`
+      )
+      .style(
+        "font-size",
+        scope.length > 105 ? "10px"
+          : scope.length > 60 ? "11px"
+          : null
+      );
+
+    // Do not recreate the map SVG.
+    map.updateData(yearRows);
+    map.updateSelection(selectedCountries);
+
+    updateSelectionLabels();
+
+    // Full chart while idle.
+    // Progressive reveal during animation.
+    lineChart.render(
+      rowsByYear,
+      selectedCountries,
+      playbackState === "idle"
+        ? lastYear
+        : year
+    );
+  }
+
+  function onCountryClick(name) {
+    if (selectedCountries.has(name)) {
+      selectedCountries.delete(name);
+    } else {
+      selectedCountries.add(name);
+    }
+
+    refresh();
+  }
+
+  // -----------------------------------
+  // Playback
+  // -----------------------------------
 
   function stopTimer() {
     if (playbackTimer !== null) {
       clearInterval(playbackTimer);
-      playbackTimer = null;
     }
+
+    playbackTimer = null;
   }
 
-  // Update the selected year and map
-  function setYear(year) {
-    selectedYear = year;
-    const yearData = getYearData();
+  function paintSlider() {
+    const progress =
+      (year - firstYear) /
+      Math.max(1, lastYear - firstYear);
 
-    // Keep selected countries even if they have no data in this year.
-    // This ensures that resetting the animation never changes country selection.
+    slider
+      .property("value", year)
+      .style(
+        "--slider-progress",
+        `${progress * 100}%`
+      );
 
-    yearSlider.property("value", selectedYear);
-
-    map.updateData(yearData); // Recolor without rebuilding the SVG (preserves zoom).
-    updateVisualizations();
+    sliderLabel.text(year);
   }
 
-  // Update button icon, message, and timeline visibility
-  function updatePlaybackControls() {
-    timeline.property("hidden", playbackState === "idle");
+  function syncControls() {
+    timeline.property(
+      "hidden",
+      playbackState === "idle"
+    );
 
-    const icons = {
-      idle: "./images/play.svg",
-      playing: "./images/pause.svg",
-      paused: "./images/play.svg",
-      finished: "./images/reset.svg"
-    };
+    const playing =
+      playbackState === "playing";
 
-    const labels = {
-      idle: "Play animation",
-      playing: "Pause animation",
-      paused: "Resume animation",
-      finished: "Reset animation"
-    };
+    playIcon.attr(
+      "src",
+      playing
+        ? "./images/pause.svg"
+        : "./images/play.svg"
+    );
 
-    const messages = {
-      idle: "Click play to view changes from 2019–2025.",
-      playing: "Playing 2019–2025. Click to pause.",
-      paused: "Paused. Click play to resume.",
-      finished: "Animation complete. Click reset to start over."
-    };
+    const label = playing
+      ? "Pause animation"
+      : "Play animation";
 
-    playbackIcon.attr("src", icons[playbackState]);
+    playButton
+      .attr("aria-label", label)
+      .attr("title", label);
 
-    playbackButton
-      .attr("aria-label", labels[playbackState])
-      .attr("title", labels[playbackState]);
-
-    playbackMessage.text(messages[playbackState]);
+    paintSlider();
   }
 
-  // Stop animation when the last year is reached
-  function finishPlayback() {
+  function setYear(nextYear) {
+    year = Math.max(
+      firstYear,
+      Math.min(
+        lastYear,
+        Number(nextYear)
+      )
+    );
+
+    paintSlider();
+    refresh();
+  }
+
+  function finish() {
     stopTimer();
+
     playbackState = "finished";
-    updatePlaybackControls();
+
+    syncControls();
+    refresh();
   }
 
-  // Automatically advance one year every second
   function startTimer() {
     stopTimer();
 
     playbackTimer = setInterval(() => {
-      if (selectedYear >= lastYear) {
-        finishPlayback();
-        return;
+      const index = years.indexOf(year);
+
+      if (index >= years.length - 1) {
+        return finish();
       }
 
-      setYear(selectedYear + 1);
+      setYear(years[index + 1]);
 
-      if (selectedYear >= lastYear) {
-        finishPlayback();
+      if (year === lastYear) {
+        finish();
       }
-    }, 1000);
+    }, 1100);
   }
 
-  // Play, pause, resume, and reset
-  playbackButton.on("click", () => {
-
-    if (playbackState === "idle") {
-      setYear(firstYear);
-      playbackState = "playing";
-      updatePlaybackControls();
-      startTimer();
-
-    } else if (playbackState === "playing") {
+  playButton.on("click", () => {
+    if (playbackState === "playing") {
       stopTimer();
       playbackState = "paused";
-      updatePlaybackControls();
-
-    } else if (playbackState === "paused") {
-      if (selectedYear >= lastYear) {
-        finishPlayback();
-      } else {
-        playbackState = "playing";
-        updatePlaybackControls();
-        startTimer();
+    } else {
+      if (
+        playbackState === "idle" ||
+        playbackState === "finished" ||
+        year === lastYear
+      ) {
+        year = firstYear;
       }
 
-    } else if (playbackState === "finished") {
-      stopTimer();
+      playbackState = "playing";
+    }
 
-      // Reset animation only: do not alter selected countries or map position.
-      setYear(lastYear);
+    syncControls();
+    refresh();
 
-      playbackState = "idle";
-      updatePlaybackControls();
+    if (playbackState === "playing") {
+      startTimer();
     }
   });
 
-  // Reset country selections and map position at any time
+  // Reset ONLY animation.
+  d3.select("#reset-timeline").on("click", () => {
+    stopTimer();
+
+    playbackState = "idle";
+    year = lastYear;
+
+    lineChart.hideFocus();
+
+    syncControls();
+    refresh();
+  });
+
+  // Reset map selection and zoom independently.
   d3.select("#reset-map").on("click", () => {
     selectedCountries.clear();
-    updateVisualizations();
     map.resetZoom();
+
+    refresh();
   });
 
-  // Allow manual year selection using the timeline
-  yearSlider.on("input", function () {
-    setYear(Number(this.value));
+  // Manual slider.
+  slider.on("input", function () {
+    stopTimer();
 
-    if (selectedYear >= lastYear && playbackState !== "idle") {
-      finishPlayback();
+    year = Number(this.value);
+
+    playbackState =
+      year === lastYear
+        ? "finished"
+        : "paused";
+
+    syncControls();
+    refresh();
+  });
+
+  // -----------------------------------
+  // Scroll positioning
+  // -----------------------------------
+
+  const scene = document.querySelector(".scroll-scene");
+  const stage = document.querySelector(".visual-stage");
+  const mapPanel = document.querySelector(".map-panel");
+  const mapTitle = document.querySelector(".map-title");
+  const chartPanel = document.querySelector(".chart-panel");
+
+  let rafPending = false;
+
+  function applyScroll() {
+    rafPending = false;
+
+    // Narrow layout uses stacked elements.
+    if (
+      window.matchMedia("(max-width: 900px)").matches
+    ) {
+      stage.style.setProperty(
+        "--scroll-progress",
+        "1"
+      );
+
+      stage.style.setProperty(
+        "--map-title-alpha",
+        "1"
+      );
+
+      stage.style.setProperty(
+        "--map-title-offset",
+        "0px"
+      );
+
+      return;
     }
-  });
 
-  // Initial state: show 2025 without the timeline
-  setYear(lastYear);
-  updatePlaybackControls();
+    const bounds = scene.getBoundingClientRect();
+
+    const travel = Math.max(
+      1,
+      scene.offsetHeight - window.innerHeight
+    );
+
+    const p = Math.max(
+      0,
+      Math.min(1, -bounds.top / travel)
+    );
+
+    const stageWidth = stage.clientWidth;
+    const stageHeight = stage.clientHeight;
+
+    const chartHeight = chartPanel.offsetHeight;
+
+    // Keep the original map aspect ratio.
+    const mapLeft = 16 * (1 - p);
+    const mapWidth = 68 - 3 * p;
+
+    // Measure the map SVG and the surrounding
+    // toolbar, legend, and summary text.
+    const oldMapSvgHeight = mapPanel
+      .querySelector("#map")
+      .getBoundingClientRect()
+      .height;
+
+    const panelChromeHeight =
+      mapPanel.offsetHeight - oldMapSvgHeight;
+
+    const mapSvgHeight =
+      stageWidth *
+      (mapWidth / 100) *
+      (510 / 960);
+
+    const mapPanelHeight =
+      mapSvgHeight + panelChromeHeight;
+
+    const titleHeight =
+      mapTitle.offsetHeight + 12;
+
+    // Center the map in the viewport,
+    // accounting for the new title.
+    const heroMapTop = Math.max(
+      135,
+      (stageHeight - mapPanelHeight) / 2 + 55
+    );
+
+    const centeredMapTop =
+      (stageHeight - mapPanelHeight + titleHeight) / 2;
+
+    const mapTop =
+      heroMapTop * (1 - p) +
+      centeredMapTop * p;
+
+    // Center the entire chart panel independently.
+    // This works even if the slider appears.
+    const centeredChartTop =
+      (stageHeight - chartHeight) / 2;
+
+    const offscreenChartTop =
+      stageHeight + 35;
+
+    const chartTop =
+      offscreenChartTop * (1 - p) +
+      centeredChartTop * p;
+
+    // Fade the map title in after the
+    // original page title has disappeared.
+    const titleProgress = Math.max(
+      0,
+      Math.min(
+        1,
+        (p - 0.48) / 0.32
+      )
+    );
+
+    stage.style.setProperty(
+      "--scroll-progress",
+      p.toFixed(4)
+    );
+
+    stage.style.setProperty(
+      "--map-left",
+      `${mapLeft}%`
+    );
+
+    stage.style.setProperty(
+      "--map-width",
+      `${mapWidth}%`
+    );
+
+    stage.style.setProperty(
+      "--map-top",
+      `${mapTop}px`
+    );
+
+    stage.style.setProperty(
+      "--chart-top",
+      `${chartTop}px`
+    );
+
+    stage.style.setProperty(
+      "--header-offset",
+      `${-230 * p}px`
+    );
+
+    stage.style.setProperty(
+      "--header-alpha",
+      Math.max(
+        0,
+        1 - 2.1 * p
+      ).toFixed(3)
+    );
+
+    stage.style.setProperty(
+      "--chart-alpha",
+      Math.max(
+        0,
+        Math.min(1, (p - 0.07) / 0.40)
+      ).toFixed(3)
+    );
+
+    stage.style.setProperty(
+      "--map-title-alpha",
+      titleProgress.toFixed(3)
+    );
+
+    stage.style.setProperty(
+      "--map-title-offset",
+      `${12 * (1 - titleProgress)}px`
+    );
+  }
+
+  function requestScrollUpdate() {
+    if (rafPending) return;
+
+    rafPending = true;
+
+    requestAnimationFrame(applyScroll);
+  }
+
+  window.addEventListener(
+    "scroll",
+    requestScrollUpdate,
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "resize",
+    requestScrollUpdate
+  );
+
+  // Recenter when text wraps or the slider appears.
+  new ResizeObserver(requestScrollUpdate)
+    .observe(chartPanel);
+
+  new ResizeObserver(requestScrollUpdate)
+    .observe(mapPanel);
+
+  // -----------------------------------
+  // Initial render
+  // -----------------------------------
+
+  syncControls();
+  refresh();
+  applyScroll();
 }
 
 main().catch(error => {
-  console.error("Failed to initialize visualizations:", error);
+  console.error(
+    "Failed to initialize visualizations:",
+    error
+  );
 
-  d3.select("#map")
-    .text(`Map failed to load: ${error.message}`);
+  const map = document.getElementById("map");
 
-  d3.select("#selection-info")
-    .text("Check the browser Console and Network tabs.");
+  if (map) {
+    map.textContent =
+      `Could not load the map: ${error.message}`;
+  }
 });

@@ -1,114 +1,243 @@
-// Draws and recolors the map. main.js owns the country selection and year.
-export async function createMap(initialData, onCountryClick) {
+
+export async function createMap(
+  initialRows,
+  onCountryClick,
+  rankDomain
+) {
   const width = 960;
   const height = 510;
+
   let dataByCountry = new Map();
+  let selectedCountries = new Set();
 
-// Match World Atlas country names to names in our CSV.
-const aliases = {
-  "United States of America": "United States",
-  "Russia": "Russian Federation",
-  "South Korea": "Republic of Korea",
-  "Vietnam": "Viet Nam",
-  "Turkey": "Türkiye",
-  "Laos": "Lao PDR",
-  "Moldova": "Republic of Moldova",
-  "Dem. Rep. Congo": "DR Congo",
-  "Côte d'Ivoire": "Côte d’Ivoire",
-  "Macedonia": "North Macedonia",
-  "Palestine": "State of Palestine",
-  "Taiwan": "Taiwan Province of China"
-};
+  const aliases = {
+    "United States of America": "United States",
+    "Russia": "Russian Federation",
+    "South Korea": "Republic of Korea",
+    "Vietnam": "Viet Nam",
+    "Turkey": "Türkiye",
+    "Laos": "Lao PDR",
+    "Moldova": "Republic of Moldova",
+    "Dem. Rep. Congo": "DR Congo",
+    "Côte d'Ivoire": "Côte d’Ivoire",
+    "Macedonia": "North Macedonia",
+    "Palestine": "State of Palestine",
+    "Taiwan": "Taiwan Province of China"
+  };
 
-  function getCountryData(feature) {
-    const name = feature.properties.name;
-    return dataByCountry.get(aliases[name] ?? name);
-  }
+  const world = await d3.json(
+    "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json"
+  );
 
-  const atlasUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
-  const world = await d3.json(atlasUrl);
-  const countries = topojson.feature(world, world.objects.countries).features;
-  // "ill-advised angry rainbow scale" - official D3.js documentation
-  const color = d3.scaleSequential(d3.interpolateOranges).domain([0, 10]);
+  const countries = topojson.feature(
+    world,
+    world.objects.countries
+  ).features;
+
+  // Rank 1 is the happiest country.
+  // Reverse the color scale domain so lower
+  // numerical ranks get darker colors.
+
+  const [minRank, maxRank] = rankDomain;
+
+  const rankRange = [maxRank, minRank];
+
+  // Selected countries: orange.
+  const orange = d3.scaleSequential()
+    .domain(rankRange)
+    .interpolator(t => d3.interpolateOranges(0.2 + t * 0.65));
+
+  // Unselected countries:
+  // light sequential grayscale.
+  const gray = d3.scaleSequential()
+    .domain(rankRange)
+    .interpolator(
+      d3.interpolateRgb("#f2f3f5", "#bcc1c9")
+    );
+
+  const noDataColor = "#e1e4e9";
+
   const projection = d3.geoNaturalEarth1()
-    .fitExtent([[12, 12], [width - 12, height - 12]], { type: "Sphere" });
+    .fitExtent(
+      [[12, 12], [width - 12, height - 12]],
+      { type: "Sphere" }
+    );
+
   const path = d3.geoPath(projection);
 
-  const svg = d3.select("#map").append("svg")
+  const svg = d3.select("#map")
+    .append("svg")
     .attr("viewBox", `0 0 ${width} ${height}`)
     .attr("role", "img")
-    .attr("aria-label", "Interactive world happiness choropleth map");
+    .attr(
+      "aria-label",
+      "Interactive happiness ranking world map"
+    );
+
   const mapLayer = svg.append("g");
+
   const tooltip = d3.select("body")
-  .append("div")
-  .attr("class", "map-tooltip")
-  .style("opacity", 0);
-  const countryPaths = mapLayer.selectAll(".country")
-    .data(countries).join("path")
+    .append("div")
+    .attr("class", "map-tooltip")
+    .style("opacity", 0);
+
+  function rowFor(feature) {
+    const atlasName = feature.properties.name;
+
+    return dataByCountry.get(
+      aliases[atlasName] ?? atlasName
+    );
+  }
+
+  const countryPaths = mapLayer
+    .selectAll(".country")
+    .data(countries)
+    .join("path")
     .attr("class", "country")
     .attr("d", path)
+
     .on("click", (event, feature) => {
-      const row = getCountryData(feature);
-      if (row) onCountryClick(row.Country);
+      const row = rowFor(feature);
+
+      if (row) {
+        onCountryClick(row.Country);
+      }
     })
-    .on("mouseenter", function(event, feature) {
-      //TODO change border color
-      // raise country to avoid funky outline issue
-      // before countries that overlapped made the border seem thinner in places
-      d3.select(this).raise(); 
-      const row = getCountryData(feature);
+
+    .on("mouseenter", (event, feature) => {
+      const row = rowFor(feature);
+
+      const title =
+        row?.Country ?? feature.properties.name;
+
+      const rank = Number(
+        row?.["Happiness Rank"]
+      );
+
+      const rankText =
+        Number.isFinite(rank) && rank > 0
+          ? rank
+          : "No data";
 
       tooltip
         .style("opacity", 1)
-        .html(row
-          ? `<strong>${row.Country}</strong><br>
-            Region: ${row.Region}<br>
-            Happiness Score: ${row["Happiness Score"]}`
-          : `${feature.properties.name}<br>No data`);
+        .text(
+          `${title} | Happiness Rank: ${rankText}`
+        );
     })
-    .on("mousemove", function(event) {
+
+    .on("mousemove", event => {
       tooltip
         .style("left", `${event.pageX + 12}px`)
         .style("top", `${event.pageY + 12}px`);
     })
-    .on("mouseleave", function() {
+
+    .on("mouseleave", () => {
       tooltip.style("opacity", 0);
     });
 
+  // -----------------------------------
+  // Map zoom and pan
+  // -----------------------------------
 
   const zoom = d3.zoom()
+    .filter(event =>
+      event.type !== "wheel" ||
+      event.ctrlKey ||
+      event.metaKey
+    )
     .scaleExtent([1, 8])
-    .translateExtent([[0, 0], [width, height]])
-    .extent([[0, 0], [width, height]])
+    .translateExtent([
+      [0, 0],
+      [width, height]
+    ])
+    .extent([
+      [0, 0],
+      [width, height]
+    ])
     .clickDistance(5)
-    .on("zoom", event => mapLayer.attr("transform", event.transform));
+    .on("zoom", event => {
+      mapLayer.attr(
+        "transform",
+        event.transform
+      );
+    });
+
   svg.call(zoom);
   svg.on("dblclick.zoom", null);
 
-  function updateData(rows) {
-    dataByCountry = new Map(rows.map(row => [row.Country, row]));
-    countryPaths
-      .attr("fill", feature => {
-        const row = getCountryData(feature);
-        return row && Number.isFinite(row["Happiness Score"])
-          ? color(row["Happiness Score"])
-          : "#d6d9df";
-      })
-      .classed("no-data", feature => !getCountryData(feature));
+  // -----------------------------------
+  // Recolor countries by rank
+  // -----------------------------------
+
+  function repaint() {
+    const hasSelection =
+      selectedCountries.size > 0;
+
+    countryPaths.attr("fill", feature => {
+      const row = rowFor(feature);
+
+      const rank = Number(
+        row?.["Happiness Rank"]
+      );
+
+      if (
+        !row ||
+        !Number.isFinite(rank) ||
+        rank < 1
+      ) {
+        return noDataColor;
+      }
+
+      const isSelected =
+        selectedCountries.has(row.Country);
+
+      // If any countries are selected,
+      // unselected countries become gray,
+      // but continue encoding rank.
+      if (hasSelection && !isSelected) {
+        return gray(rank);
+      }
+
+      return orange(rank);
+    });
+
+    countryPaths.classed(
+      "no-data",
+      feature => !rowFor(feature)
+    );
   }
 
-  function updateSelection(selectedCountries) {
-    const hasSelection = selectedCountries.size > 0;
-    countryPaths.classed("unselected", feature => {
-      const row = getCountryData(feature);
-      return hasSelection && (!row || !selectedCountries.has(row.Country));
-    });
+  function updateData(rows) {
+    dataByCountry = new Map(
+      rows.map(row => [
+        row.Country,
+        row
+      ])
+    );
+
+    repaint();
+  }
+
+  function updateSelection(nextCountries) {
+    selectedCountries = new Set(nextCountries);
+    repaint();
   }
 
   function resetZoom() {
-    svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
+    svg.transition()
+      .duration(350)
+      .call(
+        zoom.transform,
+        d3.zoomIdentity
+      );
   }
 
-  updateData(initialData);
-  return { updateData, updateSelection, resetZoom };
+  updateData(initialRows);
+
+  return {
+    updateData,
+    updateSelection,
+    resetZoom
+  };
 }

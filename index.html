@@ -4,105 +4,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Happiness Visualizations</title>
+  <title>Global Happiness | Interactive World Map</title>
+
   <link rel="stylesheet" href="./style.css">
+
   <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
   <script type="module" src="./js/main.js"></script>
 </head>
+
 <body>
+  <main>
+    <section class="scroll-scene" id="explore"
+      aria-label="Explore world happiness">
 
-<main>
+      <div class="visual-stage">
 
-  <!-- Website title -->
-  <header class="page-header">
-    <h1>Global Happiness</h1>
-    <p>Explore happiness scores around the world.</p>
-  </header>
+        <!-- Initial heading, disappears on scroll -->
+        <header class="page-header">
+          <h1>Global Happiness</h1>
+          <p>Explore happiness scores around the world.</p>
+        </header>
 
-  <section class="map-section">
+        <!-- Same interactive map throughout scrolling -->
+        <section class="map-panel"
+          aria-label="Interactive happiness ranking map">
 
-    <!-- Animation controls -->
-    <div class="map-controls">
+          <!-- Appears after scrolling -->
+          <h2 class="map-title">
+            Happiness Rankings by Country
+          </h2>
 
-      <!-- Current year and timeline -->
-      <div class="year-controls">
+          <div class="map-topbar">
+            <span id="map-year">2025</span>
 
-        <div class="year-display">
-          Year: <output id="year-label">2025</output>
-        </div>
-
-        <!-- Hidden until animation begins -->
-        <div id="timeline" class="timeline" hidden>
-          <input
-            id="year-slider"
-            type="range"
-            min="2019"
-            max="2025"
-            step="1"
-            value="2025"
-            aria-label="Select year"
-          >
-
-          <div class="year-ends">
-            <span>2019</span>
-            <span>2025</span>
+            <button
+              id="reset-map"
+              type="button"
+              title="Clear country selections and map zoom">
+              Reset Map
+            </button>
           </div>
-        </div>
 
-      </div>
+          <div id="map"></div>
 
-      <!-- Playback button and instructions -->
-      <div class="playback-controls">
+          <div class="legend"
+            aria-label="Happiness ranking color scale">
+            <span>Lower happiness</span>
+            <div class="legend-gradient"></div>
+            <span>Higher happiness</span>
+          </div>
 
-        <button
-          id="playback-button"
-          type="button"
-          aria-label="Play animation"
-          title="Play animation"
-        >
-          <img
-            id="playback-icon"
-            src="./images/play.svg"
-            alt=""
-            width="20"
-            height="20"
-          >
-        </button>
+          <p id="selection-info" aria-live="polite">
+            Loading map...
+          </p>
+        </section>
 
-        <p id="playback-message">
-          Click play to view changes from 2019–2025.
+        <!-- Line chart: still uses happiness scores -->
+        <section class="chart-panel"
+          aria-label="Happiness time series">
+
+          <div class="chart-header">
+
+            <div class="chart-heading">
+              <h2>Happiness Score Over Time</h2>
+              <p id="chart-subtitle">
+                All countries (average)
+              </p>
+            </div>
+
+            <div class="chart-buttons">
+
+              <button
+                id="playback-button"
+                class="icon-button play-button"
+                type="button"
+                aria-label="Play animation"
+                title="Play animation">
+                <img
+                  id="playback-icon"
+                  src="./images/play.svg"
+                  alt="">
+              </button>
+
+              <button
+                id="reset-timeline"
+                class="icon-button reset-button"
+                type="button"
+                aria-label="Reset animation only"
+                title="Reset animation">
+                <img
+                  src="./images/reset.svg"
+                  alt="">
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Only appears after playback starts -->
+          <div id="timeline" class="timeline" hidden>
+            <input
+              id="year-slider"
+              type="range"
+              min="2019"
+              max="2025"
+              step="1"
+              value="2019"
+              aria-label="Animation year">
+
+            <output id="year-label" for="year-slider">
+              2019
+            </output>
+          </div>
+
+          <div class="chart-plot">
+            <div id="line-chart"></div>
+
+            <div
+              id="chart-tooltip"
+              class="chart-tooltip"
+              hidden>
+            </div>
+          </div>
+
+          <div
+            id="chart-key"
+            class="chart-key"
+            aria-label="Chart legend">
+          </div>
+
+        </section>
+
+        <p class="scroll-hint" aria-hidden="true">
+          Scroll to explore trends over time
+          <span>↓</span>
         </p>
 
-        <!-- Always available: only resets country selection and map position -->
-        <button id="reset-map" type="button">
-          Reset Map
-        </button>
-
       </div>
-
-    </div>
-
-    <!-- Interactive choropleth -->
-    <div id="map"></div>
-
-    <!-- Happiness color legend -->
-    <div class="legend">
-      <span>Lower happiness</span>
-      <div class="legend-gradient"></div>
-      <span>Higher happiness</span>
-    </div>
-
-    <!-- Selected countries and average -->
-    <div class="selection-panel">
-      <p id="selection-info" aria-live="polite">
-        Loading map...
-      </p>
-    </div>
-
-  </section>
-
-</main>
-
+    </section>
+  </main>
 </body>
 </html>
