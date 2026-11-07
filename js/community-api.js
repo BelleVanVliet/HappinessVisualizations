@@ -1,6 +1,6 @@
 
-// Use the same Express API on port 3000.
-// Also supports VS Code Live Server during local development.
+ // Use the same Express API on port 3000.
+ // Also supports VS Code Live Server during local development.
 
 const onLocalhost = [
   "localhost",
@@ -12,11 +12,16 @@ const apiBase =
     ? `http://${location.hostname}:3000`
     : "";
 
+const apiPrefix =
+  location.hostname === "belle.rocks"
+    ? "/happiness"
+    : "";
+
 async function apiRequest(path, options = {}) {
   let response;
 
   try {
-    response = await fetch(`${apiBase}${path}`, {
+    response = await fetch(`${apiBase}${apiPrefix}${path}`, {
       cache: "no-store",
       ...options
     });
