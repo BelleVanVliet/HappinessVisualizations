@@ -1,0 +1,434 @@
+
+/* Community Happiness */
+/* Keep existing map and line chart CSS unchanged. */
+
+/* Extra scrolling distance at the centered map/graph frame */
+@media (min-width: 901px) {
+  .scroll-scene {
+    height: 260vh;
+  }
+}
+
+.community-section {
+  background: #fff;
+  padding: clamp(72px, 9vh, 120px) 0 100px;
+  color: #112444;
+}
+
+.community-container {
+  max-width: 1350px;
+  margin: auto;
+  padding: 0 clamp(12px, 3vw, 42px);
+}
+
+/* Heading */
+
+.community-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 13px;
+  font-weight: 750;
+  color: #f65d0a;
+}
+
+.community-kicker::before,
+.community-kicker::after {
+  content: "";
+  display: block;
+  width: min(12vw, 160px);
+  height: 1px;
+  background: #f65d0a;
+}
+
+.community-section #community-title {
+  text-align: center;
+  font-size: clamp(34px, 4.3vw, 58px);
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+  margin: 16px 0 13px;
+}
+
+.community-intro {
+  text-align: center;
+  color: #637493;
+  font-size: clamp(15px, 1.5vw, 19px);
+  margin: 0;
+}
+
+/* Rating form */
+
+.community-form {
+  margin: 60px 0 0;
+  display: grid;
+  grid-template-columns:
+    minmax(205px, 1.5fr)
+    minmax(370px, 2fr)
+    minmax(170px, 1fr)
+    auto;
+  align-items: end;
+  column-gap: 22px;
+  row-gap: 18px;
+  text-align: left;
+}
+
+.community-form-intro {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.community-smile {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid #f65d0a;
+  color: #f65d0a;
+  font-size: 29px;
+  line-height: 1;
+}
+
+.community-form-intro h3 {
+  font-size: 16px;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.community-form-intro p {
+  margin: 0;
+  font-size: 12px;
+  color: #637493;
+}
+
+/* Rating choices 1–10 */
+
+.community-rating-fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  margin: 0;
+}
+
+.community-rating-fieldset legend,
+.community-country-field {
+  font-weight: 700;
+  font-size: 13px;
+  color: #112444;
+}
+
+.community-rating-fieldset legend {
+  margin-bottom: 10px;
+}
+
+.community-rating-options {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.community-rating-option {
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.community-rating-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.community-rating-option span {
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dce2eb;
+  border-radius: 7px;
+  background: white;
+  color: #112444;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.community-rating-option input:checked + span {
+  background: #f65d0a;
+  color: #fff;
+  border-color: #f65d0a;
+}
+
+.community-rating-option input:focus-visible + span {
+  outline: 3px solid #ffab77;
+  outline-offset: 2px;
+}
+
+/* Country input */
+
+.community-country-field {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.community-country-field input {
+  width: 100%;
+  height: 40px;
+  border-radius: 7px;
+  border: 1px solid #ccd4e1;
+  background: white;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #112444;
+}
+
+/* Submit button */
+
+.community-submit {
+  min-height: 40px;
+  padding: 0 27px;
+  border: 0;
+  border-radius: 7px;
+  background: #f65d0a;
+  color: white;
+  font-weight: 750;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.community-submit:hover {
+  background: #d84f03;
+}
+
+.community-submit:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.community-status {
+  min-height: 24px;
+  text-align: center;
+  margin: 16px 0 24px;
+  font-size: 13px;
+  color: #637493;
+}
+
+.community-status[data-state="error"] {
+  color: #a32e12;
+}
+
+.community-status[data-state="success"] {
+  color: #176c41;
+}
+
+/* Borderless graph layout */
+
+.community-graphs {
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+  gap: clamp(38px, 6vw, 85px);
+  align-items: start;
+  margin-top: 35px;
+}
+
+.community-graph {
+  min-width: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.community-graph h3 {
+  font-size: clamp(21px, 2vw, 27px);
+  margin: 0 0 8px;
+  letter-spacing: -0.04em;
+}
+
+.community-graph > p {
+  color: #637493;
+  font-size: 14px;
+  margin: 0 0 26px;
+}
+
+/* Histogram */
+
+.community-histogram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.community-histogram text {
+  fill: #112444;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.community-histogram .domain {
+  stroke: #cbd3df;
+}
+
+.community-histogram .tick line {
+  stroke: #e7eaf0;
+}
+
+.community-histogram .hist-bar {
+  fill: #f65d0a;
+}
+
+.community-histogram .hist-bar:hover {
+  fill: #d84f03;
+}
+
+/* Country average bars */
+
+.community-countries {
+  display: grid;
+  gap: 19px;
+  padding-top: 9px;
+}
+
+.community-country-row {
+  display: grid;
+  grid-template-columns: minmax(104px, 130px) minmax(80px, 1fr) 36px;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.community-country-name {
+  text-align: right;
+}
+
+.community-country-track {
+  display: block;
+  height: 16px;
+  background: #e9ebf0;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.community-country-fill {
+  display: block;
+  height: 100%;
+  background: #f65d0a;
+  border-radius: inherit;
+}
+
+.community-country-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Data disclosure */
+
+.community-count {
+  text-align: center;
+  color: #637493;
+  font-size: 12px;
+  margin: 35px 0 0;
+}
+
+.community-disclaimer {
+  text-align: center;
+  font-size: 13px;
+  color: #637493;
+  font-style: italic;
+  max-width: 950px;
+  margin: 15px auto 0;
+}
+
+.community-disclaimer strong {
+  color: #f65d0a;
+}
+
+/* Responsive layout */
+
+@media (max-width: 1180px) {
+  .community-form {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(370px, 1.4fr);
+  }
+
+  .community-submit {
+    width: 160px;
+  }
+}
+
+@media (max-width: 830px) {
+  .community-graphs {
+    grid-template-columns: 1fr;
+    gap: 46px;
+  }
+
+  .community-countries {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 610px) {
+  .community-form {
+    grid-template-columns: 1fr;
+    margin-top: 45px;
+  }
+
+  .community-rating-option span {
+    height: 38px;
+  }
+
+  .community-submit {
+    width: 100%;
+  }
+
+  .community-form-intro {
+    justify-content: center;
+  }
+
+  .community-country-row {
+    grid-template-columns: 100px minmax(0, 1fr) 36px;
+    gap: 8px;
+  }
+}
+
+/* Center the single audience happiness chart */
+
+.community-graphs {
+  display: block;
+  max-width: 820px;
+  margin: 45px auto 0;
+}
+
+.community-graph {
+  width: 100%;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.community-graph h3,
+.community-graph > p {
+  text-align: center;
+}
+
+.community-histogram {
+  width: 100%;
+  margin-top: 25px;
+}
+
+.community-histogram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.community-histogram .hist-bar {
+  fill: #f65d0a;
+}
