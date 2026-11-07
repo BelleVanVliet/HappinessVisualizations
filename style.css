@@ -1,0 +1,360 @@
+
+/* ==============================
+   General Layout
+============================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 32px 24px;
+  background: #ffffff;
+  color: #1d2939;
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* ==============================
+   Website Header
+============================== */
+
+.page-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.page-header p {
+  margin: 0;
+  color: #667085;
+  font-size: 16px;
+}
+
+/* ==============================
+   Map Section
+============================== */
+
+.map-section {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* ==============================
+   Animation Controls
+============================== */
+
+.map-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+/* Year and slider on the left */
+
+.year-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+}
+
+.year-display {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.timeline {
+  width: 100%;
+  max-width: 360px;
+}
+
+/* Keep timeline hidden until playback begins */
+
+.timeline[hidden] {
+  display: none;
+}
+
+/* Orange year slider */
+
+#year-slider {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: #f16913;
+  cursor: pointer;
+}
+
+.year-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #667085;
+}
+
+/* Playback controls on the right */
+
+.playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+
+#playback-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 36px;
+
+  padding: 0;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 10px;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+#playback-button:hover {
+  background: #d1d5db;
+}
+
+#playback-button:active {
+  background: #c4c9d0;
+}
+
+#playback-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+#playback-message {
+  max-width: 260px;
+  margin: 0;
+  padding-left: 16px;
+
+  border-left: 1px solid #cbd5e1;
+
+  color: #475467;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Always-visible map reset button */
+
+#reset-map {
+  padding: 8px 14px;
+  background: #ffffff;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  color: #475467;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+#reset-map:hover {
+  background: #f3f4f6;
+}
+
+/* ==============================
+   Choropleth Map
+============================== */
+
+#map {
+  width: 100%;
+  background: transparent;
+  border: none;
+  overflow: hidden;
+}
+
+#map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  background: transparent;
+
+  touch-action: none;
+  cursor: grab;
+}
+
+#map svg:active {
+  cursor: grabbing;
+}
+
+/* Country boundaries */
+
+.country {
+  stroke: white;
+  stroke-width: 0.55;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+
+.country:hover {
+  stroke: #182230;
+  stroke-width: 1.5;
+}
+
+/* Unselected countries become gray */
+
+.country.unselected {
+  fill: #d6d9df !important;
+}
+
+.country.no-data {
+  fill: #d6d9df;
+  cursor: default;
+}
+
+/* ==============================
+   Happiness Legend
+============================== */
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  margin: 12px 0 18px;
+
+  font-size: 12px;
+  color: #667085;
+}
+
+.legend-gradient {
+  width: 180px;
+  height: 12px;
+  border-radius: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #fff5eb,
+    #fd8d3c,
+    #7f2704
+  );
+}
+
+/* ==============================
+   Selection Information
+============================== */
+
+.selection-panel {
+  text-align: center;
+  padding: 6px 0;
+}
+
+#selection-info {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ==============================
+   Map Tooltip
+============================== */
+
+.map-tooltip {
+  position: absolute;
+  pointer-events: none;
+
+  background: #1d2939;
+  color: white;
+
+  padding: 10px 14px;
+  border-radius: 6px;
+
+  font-size: 13px;
+  line-height: 1.6;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+/* ==============================
+   Responsive Layout
+============================== */
+
+@media (max-width: 800px) {
+
+  .map-controls {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .year-controls {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .playback-controls {
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+
+}
+
+@media (max-width: 620px) {
+
+  body {
+    padding: 20px 12px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .map-controls {
+    gap: 16px;
+  }
+
+  .year-controls {
+    gap: 12px;
+  }
+
+  .timeline {
+    max-width: 100%;
+  }
+
+  #playback-message {
+    max-width: 190px;
+    font-size: 12px;
+  }
+
+  .legend {
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .legend-gradient {
+    width: 110px;
+  }
+
+}

@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Happiness Visualizations</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body>
+
+<main>
+
+  <!-- Website title -->
+  <header class="page-header">
+    <h1>Global Happiness</h1>
+    <p>Explore happiness scores around the world.</p>
+  </header>
+
+  <section class="map-section">
+
+    <!-- Animation controls -->
+    <div class="map-controls">
+
+      <!-- Current year and timeline -->
+      <div class="year-controls">
+
+        <div class="year-display">
+          Year: <output id="year-label">2025</output>
+        </div>
+
+        <!-- Hidden until animation begins -->
+        <div id="timeline" class="timeline" hidden>
+          <input
+            id="year-slider"
+            type="range"
+            min="2019"
+            max="2025"
+            step="1"
+            value="2025"
+            aria-label="Select year"
+          >
+
+          <div class="year-ends">
+            <span>2019</span>
+            <span>2025</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Playback button and instructions -->
+      <div class="playback-controls">
+
+        <button
+          id="playback-button"
+          type="button"
+          aria-label="Play animation"
+          title="Play animation"
+        >
+          <img
+            id="playback-icon"
+            src="./images/play.svg"
+            alt=""
+            width="20"
+            height="20"
+          >
+        </button>
+
+        <p id="playback-message">
+          Click play to view changes from 2019–2025.
+        </p>
+
+        <!-- Always available: only resets country selection and map position -->
+        <button id="reset-map" type="button">
+          Reset Map
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- Interactive choropleth -->
+    <div id="map"></div>
+
+    <!-- Happiness color legend -->
+    <div class="legend">
+      <span>Lower happiness</span>
+      <div class="legend-gradient"></div>
+      <span>Higher happiness</span>
+    </div>
+
+    <!-- Selected countries and average -->
+    <div class="selection-panel">
+      <p id="selection-info" aria-live="polite">
+        Loading map...
+      </p>
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
