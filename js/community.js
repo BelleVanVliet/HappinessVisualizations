@@ -180,7 +180,6 @@ function drawHistogram(data) {
       "height",
       d => innerHeight - y(d.count)
     )
-    .attr("rx", 4)
     .append("title")
     .text(
       d => `Rating ${d.score}: ${d.count} responses (mock + real)`
