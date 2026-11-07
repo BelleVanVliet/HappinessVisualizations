@@ -1,0 +1,15 @@
+
+{
+  "name": "happiness-visualizations",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive World Happiness visualizations",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  }
+}
