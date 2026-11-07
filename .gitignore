@@ -1,2 +1,8 @@
 .env
 node_modules/
+
+# Country comparison bar chart
+/bar.html
+/bar.css
+/js/bar.js
+/js/charts/comparison-bar.js

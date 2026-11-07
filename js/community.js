@@ -43,10 +43,6 @@ const countLabel = document.querySelector(
   "#community-count"
 );
 
-const countryInput = document.querySelector(
-  "#happiness-country"
-);
-
 let realSummary = null;
 
 function setMessage(text, state = "") {
@@ -220,8 +216,7 @@ function redraw() {
   drawHistogram(combined.histogram);
 
   countLabel.textContent =
-    `${combined.mockCount.toLocaleString()} simulated responses + ` +
-    `${combined.realCount.toLocaleString()} actual visitor responses`;
+  `${(combined.mockCount + combined.realCount).toLocaleString()} total responses`;
 }
 
 async function refreshCommunity() {
@@ -273,7 +268,6 @@ form.addEventListener("submit", async event => {
   try {
     await submitHappiness(
       Number(chosen.value),
-      countryInput?.value.trim() || null
     );
 
     await refreshCommunity();

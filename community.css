@@ -1,33 +1,50 @@
 
-/* Community Happiness */
-/* Keep existing map and line chart CSS unchanged. */
+/* ==========================================
+   COMMUNITY HAPPINESS
+   ========================================== */
 
-/* Extra scrolling distance at the centered map/graph frame */
+/* Extra scrolling distance for the map animation */
 @media (min-width: 901px) {
   .scroll-scene {
     height: 260vh;
   }
 }
 
+/* ==========================================
+   SECTION LAYOUT
+   ========================================== */
+
 .community-section {
+  width: 100%;
+  min-height: 100vh;
   background: #fff;
-  padding: clamp(72px, 9vh, 120px) 0 100px;
+  padding: 30px 0;
   color: #112444;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .community-container {
-  max-width: 1350px;
-  margin: auto;
-  padding: 0 clamp(12px, 3vw, 42px);
+  width: min(calc(100% - 48px), 1440px);
+  margin-inline: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Heading */
+/* ==========================================
+   HEADING
+   ========================================== */
 
 .community-kicker {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 18px;
+
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -60,21 +77,30 @@
   margin: 0;
 }
 
-/* Rating form */
+/* ==========================================
+   RATING FORM
+   ========================================== */
 
 .community-form {
-  margin: 60px 0 0;
+  width: 100%;
+  max-width: 1250px;
+
+  /* Space below the main heading */
+  margin: 30px auto 0;
+
   display: grid;
   grid-template-columns:
-    minmax(205px, 1.5fr)
-    minmax(370px, 2fr)
-    minmax(170px, 1fr)
+    minmax(230px, 1fr)
+    minmax(0, 1.8fr)
     auto;
+
   align-items: end;
-  column-gap: 22px;
+  column-gap: 24px;
   row-gap: 18px;
   text-align: left;
 }
+
+/* Form introduction */
 
 .community-form-intro {
   display: flex;
@@ -86,11 +112,14 @@
 .community-smile {
   display: grid;
   place-items: center;
+
   width: 42px;
   height: 42px;
   flex: none;
+
   border-radius: 50%;
   border: 2px solid #f65d0a;
+
   color: #f65d0a;
   font-size: 29px;
   line-height: 1;
@@ -108,7 +137,9 @@
   color: #637493;
 }
 
-/* Rating choices 1–10 */
+/* ==========================================
+   RATING CHOICES 1-10
+   ========================================== */
 
 .community-rating-fieldset {
   border: 0;
@@ -117,14 +148,10 @@
   margin: 0;
 }
 
-.community-rating-fieldset legend,
-.community-country-field {
+.community-rating-fieldset legend {
   font-weight: 700;
   font-size: 13px;
   color: #112444;
-}
-
-.community-rating-fieldset legend {
   margin-bottom: 10px;
 }
 
@@ -149,11 +176,14 @@
 
 .community-rating-option span {
   height: 40px;
+
   display: grid;
   place-items: center;
+
   border: 1px solid #dce2eb;
   border-radius: 7px;
   background: white;
+
   color: #112444;
   font-size: 13px;
   font-weight: 700;
@@ -170,33 +200,18 @@
   outline-offset: 2px;
 }
 
-/* Country input */
-
-.community-country-field {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-}
-
-.community-country-field input {
-  width: 100%;
-  height: 40px;
-  border-radius: 7px;
-  border: 1px solid #ccd4e1;
-  background: white;
-  padding: 0 10px;
-  font-size: 13px;
-  color: #112444;
-}
-
-/* Submit button */
+/* ==========================================
+   SUBMIT BUTTON
+   ========================================== */
 
 .community-submit {
   min-height: 40px;
   padding: 0 27px;
+
   border: 0;
   border-radius: 7px;
   background: #f65d0a;
+
   color: white;
   font-weight: 750;
   font-size: 13px;
@@ -212,12 +227,22 @@
   cursor: wait;
 }
 
+/* Submission status */
+
 .community-status {
-  min-height: 24px;
+  min-height: 20px;
   text-align: center;
-  margin: 16px 0 24px;
+
+  /* Reduced spacing below the form */
+  margin: 8px 0 8px;
+
   font-size: 13px;
   color: #637493;
+}
+
+.community-status:empty {
+  min-height: 0;
+  margin: 0;
 }
 
 .community-status[data-state="error"] {
@@ -228,41 +253,56 @@
   color: #176c41;
 }
 
-/* Borderless graph layout */
+/* ==========================================
+   AUDIENCE HAPPINESS HISTOGRAM
+   ========================================== */
 
 .community-graphs {
-  display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
-  gap: clamp(38px, 6vw, 85px);
-  align-items: start;
-  margin-top: 35px;
+  display: block;
+  width: 100%;
+  max-width: 900px;
+
+  /* Space above the chart heading */
+  margin: 20px auto 0;
 }
 
 .community-graph {
+  width: 100%;
   min-width: 0;
+
   background: transparent;
   border: none;
   box-shadow: none;
 }
 
 .community-graph h3 {
+  text-align: center;
   font-size: clamp(21px, 2vw, 27px);
   margin: 0 0 8px;
   letter-spacing: -0.04em;
 }
 
 .community-graph > p {
+  text-align: center;
   color: #637493;
   font-size: 14px;
-  margin: 0 0 26px;
+  margin: 0 0 18px;
 }
 
-/* Histogram */
+/* Histogram SVG */
+
+.community-histogram {
+  width: 100%;
+  max-width: 900px;
+  margin: 15px auto 0;
+}
 
 .community-histogram svg {
   display: block;
   width: 100%;
   height: auto;
+  max-width: 100%;
+  margin-inline: auto;
 }
 
 .community-histogram text {
@@ -287,53 +327,15 @@
   fill: #d84f03;
 }
 
-/* Country average bars */
-
-.community-countries {
-  display: grid;
-  gap: 19px;
-  padding-top: 9px;
-}
-
-.community-country-row {
-  display: grid;
-  grid-template-columns: minmax(104px, 130px) minmax(80px, 1fr) 36px;
-  gap: 12px;
-  align-items: center;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.community-country-name {
-  text-align: right;
-}
-
-.community-country-track {
-  display: block;
-  height: 16px;
-  background: #e9ebf0;
-  border-radius: 15px;
-  overflow: hidden;
-}
-
-.community-country-fill {
-  display: block;
-  height: 100%;
-  background: #f65d0a;
-  border-radius: inherit;
-}
-
-.community-country-value {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Data disclosure */
+/* ==========================================
+   DATA DISCLOSURE
+   ========================================== */
 
 .community-count {
   text-align: center;
   color: #637493;
   font-size: 12px;
-  margin: 35px 0 0;
+  margin: 8px 0 0;
 }
 
 .community-disclaimer {
@@ -341,47 +343,83 @@
   font-size: 13px;
   color: #637493;
   font-style: italic;
+
   max-width: 950px;
-  margin: 15px auto 0;
+  margin: 5px auto 0;
 }
 
 .community-disclaimer strong {
   color: #f65d0a;
 }
 
-/* Responsive layout */
+/* ==========================================
+   RESPONSIVE LAYOUT
+   ========================================== */
+
+/* Medium desktop and tablet */
 
 @media (max-width: 1180px) {
   .community-form {
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(370px, 1.4fr);
+    max-width: 900px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 18px;
+  }
+
+  .community-form-intro {
+    grid-column: 1 / -1;
+    justify-content: center;
   }
 
   .community-submit {
-    width: 160px;
+    width: 130px;
   }
 }
+
+/* Tablet */
 
 @media (max-width: 830px) {
-  .community-graphs {
-    grid-template-columns: 1fr;
-    gap: 46px;
+  .community-container {
+    width: calc(100% - 36px);
   }
 
-  .community-countries {
-    max-width: 600px;
+  .community-graphs {
+    max-width: 100%;
+  }
+
+  .community-form {
+    grid-template-columns: 1fr;
+    max-width: 650px;
+  }
+
+  .community-form-intro {
+    grid-column: auto;
+  }
+
+  .community-submit {
+    width: 100%;
   }
 }
 
+/* Mobile */
+
 @media (max-width: 610px) {
+  .community-section {
+    min-height: 100vh;
+    padding: 35px 0;
+  }
+
   .community-form {
     grid-template-columns: 1fr;
-    margin-top: 45px;
+    margin-top: 30px;
+  }
+
+  .community-rating-options {
+    gap: 4px;
   }
 
   .community-rating-option span {
     height: 38px;
+    font-size: 11px;
   }
 
   .community-submit {
@@ -392,43 +430,25 @@
     justify-content: center;
   }
 
-  .community-country-row {
-    grid-template-columns: 100px minmax(0, 1fr) 36px;
-    gap: 8px;
+  .community-kicker {
+    gap: 10px;
+    letter-spacing: 0.12em;
   }
-}
 
-/* Center the single audience happiness chart */
+  .community-kicker::before,
+  .community-kicker::after {
+    width: 35px;
+  }
 
-.community-graphs {
-  display: block;
-  max-width: 820px;
-  margin: 45px auto 0;
-}
+  .community-graph h3 {
+    font-size: 22px;
+  }
 
-.community-graph {
-  width: 100%;
-  border: none;
-  background: transparent;
-  box-shadow: none;
-}
+  .community-graph > p {
+    font-size: 13px;
+  }
 
-.community-graph h3,
-.community-graph > p {
-  text-align: center;
-}
-
-.community-histogram {
-  width: 100%;
-  margin-top: 25px;
-}
-
-.community-histogram svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.community-histogram .hist-bar {
-  fill: #f65d0a;
+  .community-disclaimer {
+    font-size: 12px;
+  }
 }

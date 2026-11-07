@@ -86,8 +86,13 @@
 
             <div class="chart-heading">
               <h2>Happiness Score Over Time</h2>
+
               <p id="chart-subtitle">
                 All countries (average)
+              </p>
+
+              <p class="chart-instruction">
+                Click play to see how global happiness has changed over time.
               </p>
             </div>
 
@@ -314,38 +319,6 @@
             </div>
           </fieldset>
 
-          <!-- Optional country for actual submissions -->
-          <label
-            class="community-country-field"
-            for="happiness-country"
-          >
-            Country (optional)
-
-            <input
-              id="happiness-country"
-              name="country"
-              list="community-country-options"
-              maxlength="100"
-              placeholder="e.g. United States"
-              autocomplete="country-name"
-            >
-          </label>
-
-          <datalist id="community-country-options">
-            <option value="United States"></option>
-            <option value="Canada"></option>
-            <option value="Finland"></option>
-            <option value="Australia"></option>
-            <option value="United Kingdom"></option>
-            <option value="Germany"></option>
-            <option value="Japan"></option>
-            <option value="Brazil"></option>
-            <option value="India"></option>
-            <option value="Mexico"></option>
-            <option value="France"></option>
-            <option value="Sweden"></option>
-          </datalist>
-
           <button
             id="submit-happiness"
             class="community-submit"
@@ -401,10 +374,7 @@
         <!-- Data transparency notice -->
         <p class="community-disclaimer">
           <strong>Note:</strong>
-          This visualization uses mock data and was
-          coded for fun. Actual visitor submissions
-          are included separately. Neither dataset
-          is part of the World Happiness Report.
+          This visualization combines mock data with user-entered data.
         </p>
 
       </div>
