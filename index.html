@@ -4,32 +4,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Global Happiness | Interactive World Map</title>
 
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./community.css">
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+
   <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/community.js"></script>
 </head>
 
 <body>
   <main>
-    <section class="scroll-scene" id="explore"
-      aria-label="Explore world happiness">
 
+    <!-- =========================================
+         GLOBAL HAPPINESS
+         ========================================= -->
+
+    <section
+      class="scroll-scene"
+      id="explore"
+      aria-label="Explore world happiness"
+    >
       <div class="visual-stage">
 
-        <!-- Initial heading, disappears on scroll -->
+        <!-- Initial title: disappears when scrolling -->
         <header class="page-header">
           <h1>Global Happiness</h1>
           <p>Explore happiness scores around the world.</p>
         </header>
 
-        <!-- Same interactive map throughout scrolling -->
-        <section class="map-panel"
-          aria-label="Interactive happiness ranking map">
-
+        <!-- Interactive choropleth map -->
+        <section
+          class="map-panel"
+          aria-label="Interactive happiness ranking map"
+        >
           <!-- Appears after scrolling -->
           <h2 class="map-title">
             Happiness Rankings by Country
@@ -41,67 +53,84 @@
             <button
               id="reset-map"
               type="button"
-              title="Clear country selections and map zoom">
+              title="Clear country selections and map zoom"
+            >
               Reset Map
             </button>
           </div>
 
           <div id="map"></div>
 
-          <div class="legend"
-            aria-label="Happiness ranking color scale">
+          <!-- Map legend stays orange -->
+          <div
+            class="legend"
+            aria-label="Happiness ranking color scale"
+          >
             <span>Lower happiness</span>
             <div class="legend-gradient"></div>
             <span>Higher happiness</span>
           </div>
 
+          <!-- Empty when no countries are selected -->
           <p id="selection-info" aria-live="polite">
             Loading map...
           </p>
         </section>
 
-        <!-- Line chart: still uses happiness scores -->
-        <section class="chart-panel"
-          aria-label="Happiness time series">
-
+        <!-- Happiness score line graph -->
+        <section
+          class="chart-panel"
+          aria-label="Happiness score over time"
+        >
           <div class="chart-header">
 
             <div class="chart-heading">
               <h2>Happiness Score Over Time</h2>
+
               <p id="chart-subtitle">
                 All countries (average)
+              </p>
+
+              <p class="chart-instruction">
+                Click play to see how global happiness has changed over time.
               </p>
             </div>
 
             <div class="chart-buttons">
 
+              <!-- Single play/pause button -->
               <button
                 id="playback-button"
                 class="icon-button play-button"
                 type="button"
                 aria-label="Play animation"
-                title="Play animation">
+                title="Play animation"
+              >
                 <img
                   id="playback-icon"
                   src="./images/play.svg"
-                  alt="">
+                  alt=""
+                >
               </button>
 
+              <!-- Animation reset only -->
               <button
                 id="reset-timeline"
                 class="icon-button reset-button"
                 type="button"
                 aria-label="Reset animation only"
-                title="Reset animation">
+                title="Reset animation"
+              >
                 <img
                   src="./images/reset.svg"
-                  alt="">
+                  alt=""
+                >
               </button>
 
             </div>
           </div>
 
-          <!-- Only appears after playback starts -->
+          <!-- Visible after playback starts -->
           <div id="timeline" class="timeline" hidden>
             <input
               id="year-slider"
@@ -110,7 +139,8 @@
               max="2025"
               step="1"
               value="2019"
-              aria-label="Animation year">
+              aria-label="Animation year"
+            >
 
             <output id="year-label" for="year-slider">
               2019
@@ -123,18 +153,18 @@
             <div
               id="chart-tooltip"
               class="chart-tooltip"
-              hidden>
-            </div>
+              hidden
+            ></div>
           </div>
 
           <div
             id="chart-key"
             class="chart-key"
-            aria-label="Chart legend">
-          </div>
-
+            aria-label="Chart legend"
+          ></div>
         </section>
 
+        <!-- Opening scroll hint -->
         <p class="scroll-hint" aria-hidden="true">
           Scroll to explore trends over time
           <span>↓</span>
@@ -142,6 +172,214 @@
 
       </div>
     </section>
+
+    <!-- =========================================
+         COMMUNITY HAPPINESS
+         ========================================= -->
+
+    <section
+      id="community"
+      class="community-section"
+      aria-labelledby="community-title"
+    >
+      <div class="community-container">
+
+        <!-- Community heading -->
+        <p class="community-kicker">
+          Community Happiness
+        </p>
+
+        <h2 id="community-title">
+          How Happy Are You?
+        </h2>
+
+        <p class="community-intro">
+          Share your happiness rating and explore
+          how visitors are feeling.
+        </p>
+
+        <!-- =====================================
+             USER SUBMISSION FORM
+             ===================================== -->
+
+        <form id="happiness-form" class="community-form">
+
+          <div class="community-form-intro">
+            <span
+              class="community-smile"
+              aria-hidden="true"
+            >
+              ☺
+            </span>
+
+            <div>
+              <h3>Share Your Happiness Rating</h3>
+              <p>Add your rating to our community view.</p>
+            </div>
+          </div>
+
+          <!-- Rating: 1 through 10 -->
+          <fieldset class="community-rating-fieldset">
+            <legend>Happiness (1–10)</legend>
+
+            <div class="community-rating-options">
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="1"
+                  required
+                >
+                <span>1</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="2"
+                >
+                <span>2</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="3"
+                >
+                <span>3</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="4"
+                >
+                <span>4</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="5"
+                >
+                <span>5</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="6"
+                >
+                <span>6</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="7"
+                  checked
+                >
+                <span>7</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="8"
+                >
+                <span>8</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="9"
+                >
+                <span>9</span>
+              </label>
+
+              <label class="community-rating-option">
+                <input
+                  type="radio"
+                  name="happiness-score"
+                  value="10"
+                >
+                <span>10</span>
+              </label>
+
+            </div>
+          </fieldset>
+
+          <button
+            id="submit-happiness"
+            class="community-submit"
+            type="submit"
+          >
+            Submit
+          </button>
+
+        </form>
+
+        <!-- Submission feedback -->
+        <p
+          id="submission-message"
+          class="community-status"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+        <!-- =====================================
+             AUDIENCE HAPPINESS BAR CHART
+             ===================================== -->
+
+        <div class="community-graphs">
+
+          <section
+            class="community-graph"
+            aria-labelledby="community-chart-title"
+          >
+            <h3 id="community-chart-title">
+              Audience Happiness Scores
+            </h3>
+
+            <p>
+              Distribution of happiness ratings
+              from our community
+            </p>
+
+            <div
+              id="community-chart"
+              class="community-histogram"
+            ></div>
+          </section>
+
+        </div>
+
+        <!-- Response count -->
+        <p
+          id="community-count"
+          class="community-count"
+          aria-live="polite"
+        ></p>
+
+        <!-- Data transparency notice -->
+        <p class="community-disclaimer">
+          <strong>Note:</strong>
+          This visualization combines mock data with user-entered data.
+        </p>
+
+      </div>
+    </section>
+
   </main>
 </body>
 </html>

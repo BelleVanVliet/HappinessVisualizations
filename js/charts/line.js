@@ -129,7 +129,7 @@ export function createLineChart(allRows, years) {
     }
 
     if (chartSelection.length === 2) {
-      return chartSelection.join(" and ");
+      return `${chartSelection.join(" and ")} (average)`;
     }
 
     return "Selected countries (average)";

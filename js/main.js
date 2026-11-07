@@ -176,13 +176,22 @@ async function main() {
 
     d3.select("#map-year").text(year);
 
+
     d3.select("#selection-info")
       .text(
-        `${scope} | Average happiness rank (${year}): ${
-          averageRank === undefined
-            ? "N/A"
-            : averageRank.toFixed(1)
-        }`
+        selectedCountries.size === 0
+          ? ""
+          : `${scope} | ${
+              selectedCountries.size === 1
+                ? "Happiness rank"
+                : "Average happiness rank"
+            } (${year}): ${
+              averageRank === undefined
+                ? "N/A"
+                : selectedCountries.size === 1
+                  ? Math.round(averageRank)
+                  : averageRank.toFixed(1)
+            }`
       )
       .style(
         "font-size",
@@ -190,6 +199,7 @@ async function main() {
           : scope.length > 60 ? "11px"
           : null
       );
+
 
     // Do not recreate the map SVG.
     map.updateData(yearRows);
@@ -416,9 +426,10 @@ async function main() {
       scene.offsetHeight - window.innerHeight
     );
 
+    
     const p = Math.max(
       0,
-      Math.min(1, -bounds.top / travel)
+      Math.min(1, -bounds.top / (travel * 0.58))
     );
 
     const stageWidth = stage.clientWidth;

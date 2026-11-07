@@ -1,0 +1,454 @@
+
+/* ==========================================
+   COMMUNITY HAPPINESS
+   ========================================== */
+
+/* Extra scrolling distance for the map animation */
+@media (min-width: 901px) {
+  .scroll-scene {
+    height: 260vh;
+  }
+}
+
+/* ==========================================
+   SECTION LAYOUT
+   ========================================== */
+
+.community-section {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+  padding: 30px 0;
+  color: #112444;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.community-container {
+  width: min(calc(100% - 48px), 1440px);
+  margin-inline: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ==========================================
+   HEADING
+   ========================================== */
+
+.community-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 13px;
+  font-weight: 750;
+  color: #f65d0a;
+}
+
+.community-kicker::before,
+.community-kicker::after {
+  content: "";
+  display: block;
+  width: min(12vw, 160px);
+  height: 1px;
+  background: #f65d0a;
+}
+
+.community-section #community-title {
+  text-align: center;
+  font-size: clamp(34px, 4.3vw, 58px);
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+  margin: 16px 0 13px;
+}
+
+.community-intro {
+  text-align: center;
+  color: #637493;
+  font-size: clamp(15px, 1.5vw, 19px);
+  margin: 0;
+}
+
+/* ==========================================
+   RATING FORM
+   ========================================== */
+
+.community-form {
+  width: 100%;
+  max-width: 1250px;
+
+  /* Space below the main heading */
+  margin: 30px auto 0;
+
+  display: grid;
+  grid-template-columns:
+    minmax(230px, 1fr)
+    minmax(0, 1.8fr)
+    auto;
+
+  align-items: end;
+  column-gap: 24px;
+  row-gap: 18px;
+  text-align: left;
+}
+
+/* Form introduction */
+
+.community-form-intro {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.community-smile {
+  display: grid;
+  place-items: center;
+
+  width: 42px;
+  height: 42px;
+  flex: none;
+
+  border-radius: 50%;
+  border: 2px solid #f65d0a;
+
+  color: #f65d0a;
+  font-size: 29px;
+  line-height: 1;
+}
+
+.community-form-intro h3 {
+  font-size: 16px;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.community-form-intro p {
+  margin: 0;
+  font-size: 12px;
+  color: #637493;
+}
+
+/* ==========================================
+   RATING CHOICES 1-10
+   ========================================== */
+
+.community-rating-fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  margin: 0;
+}
+
+.community-rating-fieldset legend {
+  font-weight: 700;
+  font-size: 13px;
+  color: #112444;
+  margin-bottom: 10px;
+}
+
+.community-rating-options {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.community-rating-option {
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.community-rating-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.community-rating-option span {
+  height: 40px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #dce2eb;
+  border-radius: 7px;
+  background: white;
+
+  color: #112444;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.community-rating-option input:checked + span {
+  background: #f65d0a;
+  color: #fff;
+  border-color: #f65d0a;
+}
+
+.community-rating-option input:focus-visible + span {
+  outline: 3px solid #ffab77;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   SUBMIT BUTTON
+   ========================================== */
+
+.community-submit {
+  min-height: 40px;
+  padding: 0 27px;
+
+  border: 0;
+  border-radius: 7px;
+  background: #f65d0a;
+
+  color: white;
+  font-weight: 750;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.community-submit:hover {
+  background: #d84f03;
+}
+
+.community-submit:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* Submission status */
+
+.community-status {
+  min-height: 20px;
+  text-align: center;
+
+  /* Reduced spacing below the form */
+  margin: 8px 0 8px;
+
+  font-size: 13px;
+  color: #637493;
+}
+
+.community-status:empty {
+  min-height: 0;
+  margin: 0;
+}
+
+.community-status[data-state="error"] {
+  color: #a32e12;
+}
+
+.community-status[data-state="success"] {
+  color: #176c41;
+}
+
+/* ==========================================
+   AUDIENCE HAPPINESS HISTOGRAM
+   ========================================== */
+
+.community-graphs {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+
+  /* Space above the chart heading */
+  margin: 20px auto 0;
+}
+
+.community-graph {
+  width: 100%;
+  min-width: 0;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.community-graph h3 {
+  text-align: center;
+  font-size: clamp(21px, 2vw, 27px);
+  margin: 0 0 8px;
+  letter-spacing: -0.04em;
+}
+
+.community-graph > p {
+  text-align: center;
+  color: #637493;
+  font-size: 14px;
+  margin: 0 0 18px;
+}
+
+/* Histogram SVG */
+
+.community-histogram {
+  width: 100%;
+  max-width: 900px;
+  margin: 15px auto 0;
+}
+
+.community-histogram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.community-histogram text {
+  fill: #112444;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.community-histogram .domain {
+  stroke: #cbd3df;
+}
+
+.community-histogram .tick line {
+  stroke: #e7eaf0;
+}
+
+.community-histogram .hist-bar {
+  fill: #f65d0a;
+}
+
+.community-histogram .hist-bar:hover {
+  fill: #d84f03;
+}
+
+/* ==========================================
+   DATA DISCLOSURE
+   ========================================== */
+
+.community-count {
+  text-align: center;
+  color: #637493;
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+
+.community-disclaimer {
+  text-align: center;
+  font-size: 13px;
+  color: #637493;
+  font-style: italic;
+
+  max-width: 950px;
+  margin: 5px auto 0;
+}
+
+.community-disclaimer strong {
+  color: #f65d0a;
+}
+
+/* ==========================================
+   RESPONSIVE LAYOUT
+   ========================================== */
+
+/* Medium desktop and tablet */
+
+@media (max-width: 1180px) {
+  .community-form {
+    max-width: 900px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 18px;
+  }
+
+  .community-form-intro {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .community-submit {
+    width: 130px;
+  }
+}
+
+/* Tablet */
+
+@media (max-width: 830px) {
+  .community-container {
+    width: calc(100% - 36px);
+  }
+
+  .community-graphs {
+    max-width: 100%;
+  }
+
+  .community-form {
+    grid-template-columns: 1fr;
+    max-width: 650px;
+  }
+
+  .community-form-intro {
+    grid-column: auto;
+  }
+
+  .community-submit {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 610px) {
+  .community-section {
+    min-height: 100vh;
+    padding: 35px 0;
+  }
+
+  .community-form {
+    grid-template-columns: 1fr;
+    margin-top: 30px;
+  }
+
+  .community-rating-options {
+    gap: 4px;
+  }
+
+  .community-rating-option span {
+    height: 38px;
+    font-size: 11px;
+  }
+
+  .community-submit {
+    width: 100%;
+  }
+
+  .community-form-intro {
+    justify-content: center;
+  }
+
+  .community-kicker {
+    gap: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .community-kicker::before,
+  .community-kicker::after {
+    width: 35px;
+  }
+
+  .community-graph h3 {
+    font-size: 22px;
+  }
+
+  .community-graph > p {
+    font-size: 13px;
+  }
+
+  .community-disclaimer {
+    font-size: 12px;
+  }
+}
